@@ -1,0 +1,27 @@
+# Archivos auxiliares de LaTeX
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.idx
+*.ilg
+*.ind
+*.lof
+*.lot
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.xdv
+*.log
+
+# Archivos de presentación
+*.nav
+*.snm
+*.vrb
+
+# Carpetas de compilación
+build/
+_minted*/
