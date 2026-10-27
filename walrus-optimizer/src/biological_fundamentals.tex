@@ -1,0 +1,61 @@
+\subsection{Biyolojik Temeller}
+
+Walrus Optimizer (WO), morsaların yaşam biçimlerinden ve grup
+davranışlarından esinlenen sürü zekâsı tabanlı bir meta-sezgisel
+algoritmadır. Han ve arkadaşları, özellikle göç etme, üreme, birlikte
+dinlenme, besin arama ve tehlikeden kaçınma davranışlarını algoritmanın
+kavramsal temelini oluşturmak için kullanmıştır.
+
+Morsalar, çoğunlukla Arktik çevresindeki soğuk denizlerde yaşayan ve
+gruplar hâlinde hareket eden memelilerdir. Karada ve buz üzerinde
+dinlenebilir, su altında besin arayabilirler. Üst dudaklarındaki hassas
+bıyıklar çevreyi algılamalarına yardımcı olur; uzun köpek dişleri ise
+savunma, deniz tabanındaki besinleri ortaya çıkarma ve buz üzerine
+tırmanma gibi işlevler görür. Bu özellikler, WO'da kullanılan
+mekanizmaların biyolojik arka planını açıklar; ancak algoritmadaki
+matematiksel işlemler bu davranışların doğrudan biyolojik kopyaları
+değil, optimizasyon amacıyla yapılmış soyutlamalardır.
+
+\paragraph{Sosyal ve çevresel davranışlar.}
+WO'nun dayandığı biyolojik gözlemler aşağıdaki şekilde özetlenebilir:
+
+\begin{itemize}
+    \item \textbf{Üreme döneminde alan seçimi:} Üreme döneminde erkek
+    morsalar sahilde bölgeler edinir. Makalede, daha güçlü erkeklerin
+    daha elverişli bölgeleri elde edebildiği ve bölgenin büyüklüğünün
+    eşleştikleri dişi sayısıyla ilişkili olduğu belirtilir.
+
+    \item \textbf{Besin arama ve bilgi paylaşımı:} Morsalar deniz
+    tabanında besin ararken çevrelerinden yararlanır. Makale, onların
+    ses yoluyla yön bulma ve besin bilgilerini diğer bireylerle paylaşma
+    davranışlarına dikkat çeker.
+
+    \item \textbf{Toplu savunma ve yardımlaşma:} Katil balina gibi
+    tehditlerle karşılaştıklarında morsalar grup hâlinde savunma
+    davranışı gösterebilir ve yaralanan bireylere yardım edebilir.
+    Bu gözlem, tehlikeye karşı sürü üyelerinin birbirleriyle
+    etkileşimini vurgular.
+
+    \item \textbf{Göç ve dinlenme:} Morsalar çevresel koşullara ve
+    yaşam döngülerine bağlı olarak hareket eder; karada veya buz
+    üzerinde topluca dinlenebilir, suya girerek besin arayabilir.
+\end{itemize}
+
+\paragraph{Biyolojik davranışların optimizasyonla ilişkisi.}
+WO, bu gözlemleri arama sürecinde farklı işlevleri olan mekanizmalar
+olarak ele alır. Göç davranışı, arama ajanlarının çözüm uzayında yeni
+bölgelere yönelmesini; besin arama, aday çözümlerin değerlendirilmesini
+ve umut vadeden bölgelerde daha ayrıntılı arama yapılmasını temsil eder.
+Üreme davranışı, başarılı çözümlerden yararlanarak yeni aday çözümler
+oluşturma fikrine karşılık gelir. Dinlenme ve toplu davranışlar sürü
+içindeki etkileşimleri, tehlikeden kaçınma ise arama sürecinde konum
+değiştirerek yerel çözümlere aşırı bağlı kalma riskini azaltma fikrini
+destekler.
+
+Bu biyolojik analojiler, WO'da arama uzayını keşfetme
+(\textit{exploration}) ile mevcut iyi çözümlerin çevresinde yoğunlaşma
+(\textit{exploitation}) arasında denge kurmak amacıyla kullanılır.
+Dolayısıyla morsaların davranışları algoritmanın kavramsal
+esin kaynağını oluştururken, gerçek optimizasyon işlemleri makalenin
+sonraki bölümünde tanımlanan matematiksel güncelleme kurallarıyla
+gerçekleştirilir.
