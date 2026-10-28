@@ -1,0 +1,330 @@
+\subsection{Matematiksel Model ve Algoritma}
+
+Walrus Optimizer (WO), sürekli optimizasyon problemlerinde her bir
+morsayı bir aday çözüm olarak ele alır. Bir morsanın konumu,
+problemin karar değişkenlerinden oluşan bir vektördür. WO'nun amacı,
+bu vektörleri yinelemeli olarak güncelleyerek amaç fonksiyonunu en
+küçükleyen veya en büyükleyen çözümü bulmaktır.
+
+Bu bölümde, en küçükleme problemi ele alınmaktadır:
+
+\begin{equation}
+    \min_{\mathbf{x}} f(\mathbf{x}),
+    \qquad
+    \mathbf{LB} \leq \mathbf{x} \leq \mathbf{UB},
+    \label{eq:wo_problem}
+\end{equation}
+
+Burada $f(\mathbf{x})$ amaç fonksiyonunu, $\mathbf{LB}$ ve
+$\mathbf{UB}$ ise karar değişkenlerinin alt ve üst sınırlarını
+göstermektedir. En büyükleme problemleri, amaç fonksiyonunun işareti
+değiştirilerek en küçükleme problemine dönüştürülebilir.
+
+\subsubsection{Başlangıç popülasyonu}
+
+Popülasyon, $N$ adet morsadan oluşur. $d$ karar değişkeni bulunan bir
+problemde, $i$'inci morsanın konumu
+$\mathbf{X}_i=(X_{i,1},X_{i,2},\ldots,X_{i,d})$ biçimindedir.
+Başlangıç konumları, arama uzayına düzgün dağılımlı rastgele sayılar
+kullanılarak yerleştirilir:
+
+\begin{equation}
+    X_{i,j}^{0}
+    =
+    LB_j + u_{i,j}(UB_j-LB_j),
+    \qquad
+    u_{i,j}\sim\mathcal{U}(0,1),
+    \label{eq:wo_initialization}
+\end{equation}
+
+Burada $i=1,\ldots,N$ ve $j=1,\ldots,d$'dir. Başlangıç popülasyonunda
+morsaların yüzde 90'ı yetişkin, yüzde 10'u yavru olarak kabul edilir.
+Yetişkin morsalar kendi içinde eşit sayıda erkek ve dişi bireyden
+oluşur. Her aday çözümün uygunluğu $f(\mathbf{X}_i)$ hesaplanır ve
+en iyi çözüm $\mathbf{X}_{\mathrm{best}}$ olarak kaydedilir.
+
+\subsubsection{Tehlike ve güvenlik sinyalleri}
+
+WO'da sürünün davranışını seçmek için tehlike ve güvenlik sinyalleri
+kullanılır. $t$ mevcut yinelemeyi, $T$ ise en fazla yineleme sayısını
+göstersin. Tehlike sinyali aşağıdaki gibi tanımlanır:
+
+\begin{align}
+    \alpha_t &= 1-\frac{t}{T}, \label{eq:wo_alpha}\\
+    A_t &= 2\alpha_t, \label{eq:wo_A}\\
+    R_t &= 2r_1-1, \qquad r_1\sim\mathcal{U}(0,1), \label{eq:wo_R}\\
+    D_t &= A_tR_t. \label{eq:wo_danger}
+\end{align}
+
+Güvenlik sinyali ise başka bir düzgün dağılımlı rastgele sayı ile
+hesaplanır:
+
+\begin{equation}
+    S_t=r_2,
+    \qquad
+    r_2\sim\mathcal{U}(0,1).
+    \label{eq:wo_safety}
+\end{equation}
+
+Yineleme ilerledikçe $\alpha_t$ azalır. WO, bu sinyalleri kullanarak
+arama davranışını göç, dinlenme, besin arama ve kaçış aşamalarından
+birine yönlendirir.
+
+\subsubsection{Göç: keşif aşaması}
+
+Tehlike sinyalinin mutlak değeri en az 1 olduğunda sürü göç davranışı
+gösterir. Algoritmik açıdan bu davranış, aday çözümlerin arama
+uzayında yeni bölgelere yönlendirilmesini sağlar. $m$ ve $n$, sürüden
+rastgele seçilen iki farklı bireyi göstermek üzere:
+
+\begin{align}
+    \mathbf{X}_i^{t+1}
+    &=
+    \mathbf{X}_i^t+\mathbf{M}_t,
+    \label{eq:wo_migration}\\
+    \mathbf{M}_t
+    &=
+    \left(\mathbf{X}_m^t-\mathbf{X}_n^t\right)
+    \beta_t r_3^2,
+    \qquad r_3\sim\mathcal{U}(0,1),
+    \label{eq:wo_migration_step}\\
+    \beta_t
+    &=
+    1-
+    \frac{1}{
+        1+\exp\left(
+            -10\frac{t-T/2}{T}
+        \right)
+    }.
+    \label{eq:wo_beta}
+\end{align}
+
+Burada $\mathbf{M}_t$ göç adımını, $\beta_t$ ise bu adımın büyüklüğünü
+kontrol eden katsayıyı ifade eder. $\beta_t$ yinelemeler boyunca
+azalarak aramanın başlangıcında daha geniş, ilerleyen aşamalarda ise
+daha sınırlı hareketler yapılmasına katkıda bulunur.
+
+\subsubsection{Üreme: sömürü aşaması}
+
+$|D_t|<1$ olduğunda WO üreme aşamasına geçer. Bu aşamada güvenlik
+sinyali, morsaların kıyıda dinlenme davranışını mı yoksa su altında
+besin arama davranışını mı izleyeceğini belirler.
+
+\paragraph{Kıyıda dinlenme davranışı.}
+
+$S_t\geq 0.5$ olduğunda dinlenme davranışı uygulanır. Bu davranışta
+morsalar erkek, dişi ve yavru bireyler olarak ele alınır ve her grubun
+konumu farklı biçimde güncellenir.
+
+Erkek bireylerin konumları Halton dizisi kullanılarak arama uzayına
+yeniden dağıtılır. Bir uygulamada bu işlem aşağıdaki biçimde
+gerçekleştirilebilir:
+
+\begin{equation}
+    X_{i,j}^{t+1}
+    =
+    LB_j+h_{i,j}^{t}(UB_j-LB_j),
+    \qquad h_{i,j}^{t}\in[0,1],
+    \label{eq:wo_male_halton}
+\end{equation}
+
+Burada $h_{i,j}^{t}$, Halton dizisinin $j$'inci boyutundaki değeridir.
+Bu işlem erkek bireylerin farklı bölgeleri örneklemesini ve
+popülasyon çeşitliliğinin korunmasını amaçlar.
+
+Dişi bireylerin konumları hem eş olarak kabul edilen erkek bireyden
+hem de sürünün o ana kadarki en iyi çözümünden etkilenir:
+
+\begin{equation}
+\begin{aligned}
+    \mathbf{F}_i^{t+1}
+    ={}& \mathbf{F}_i^t
+    +\alpha_t\left(\mathbf{M}_i^t-\mathbf{F}_i^t\right)\\
+    &+(1-\alpha_t)
+    \left(\mathbf{X}_{\mathrm{best}}^t-\mathbf{F}_i^t\right).
+\end{aligned}
+\label{eq:wo_female}
+\end{equation}
+
+Burada $\mathbf{F}_i^t$ dişi bireyin, $\mathbf{M}_i^t$ ise onunla
+eşleştirilen erkek bireyin konumudur. $\alpha_t$ azaldıkça erkek
+bireyin etkisi azalır; en iyi çözümün etkisi artar.
+
+Yavru bireyler için önce güvenli referans konumu hesaplanır:
+
+\begin{align}
+    \mathbf{O}_i^t
+    &=
+    \mathbf{X}_{\mathrm{best}}^t
+    +\mathbf{J}_i^t\odot\mathbf{LF},
+    \label{eq:wo_safety_position}\\
+    \mathbf{J}_i^{t+1}
+    &=
+    \left(\mathbf{O}_i^t-\mathbf{J}_i^t\right)P,
+    \qquad P\sim\mathcal{U}(0,1).
+    \label{eq:wo_juvenile}
+\end{align}
+
+Burada $\mathbf{J}_i^t$ yavru bireyin mevcut konumu, $P$ rastgele
+rahatsızlık katsayısı, $\odot$ bileşen bazında çarpım ve $\mathbf{LF}$
+Lévy dağılımına dayalı hareket vektörüdür. Lévy hareketi aşağıdaki
+biçimde modellenir:
+
+\begin{align}
+    LF
+    &=
+    0.05\frac{x}{|y|^{1/\lambda}},
+    \qquad
+    x\sim\mathcal{N}(0,\sigma_x^2),
+    \quad
+    y\sim\mathcal{N}(0,\sigma_y^2),
+    \label{eq:wo_levy}\\
+    \sigma_x
+    &=
+    \left[
+        \frac{
+            \Gamma(1+\lambda)\sin(\pi\lambda/2)
+        }{
+            \Gamma((1+\lambda)/2)\lambda 2^{(\lambda-1)/2}
+        }
+    \right]^{1/\lambda},
+    \qquad
+    \sigma_y=1,
+    \qquad
+    \lambda=1.5.
+    \label{eq:wo_levy_sigma}
+\end{align}
+
+$\Gamma(\cdot)$, Gamma fonksiyonudur. Lévy hareketinin uzun adımlar
+üretebilmesi, yavru bireylerin çevredeki çözümlerden uzaklaşarak farklı
+bölgeleri örneklemesine olanak tanır.
+
+\paragraph{Su altında besin arama davranışı.}
+
+$S_t<0.5$ olduğunda algoritma besin arama davranışına geçer. Bu
+davranış, tehlike sinyaline göre kaçış veya toplanma olarak ikiye
+ayrılır.
+
+$|D_t|\geq 0.5$ olduğunda kaçış davranışı uygulanır:
+
+\begin{equation}
+    \mathbf{X}_i^{t+1}
+    =
+    \mathbf{X}_i^t R_t
+    -
+    \left|
+        \mathbf{X}_{\mathrm{best}}^t-\mathbf{X}_i^t
+    \right|r_4^2,
+    \qquad r_4\sim\mathcal{U}(0,1).
+    \label{eq:wo_fleeing}
+\end{equation}
+
+Mutlak değer, vektörlerde bileşen bazında alınır. Bu güncelleme,
+bireyin mevcut konumunu değiştirerek sürünün bulunduğu bölgeden
+uzaklaşmasını sağlar.
+
+$|D_t|<0.5$ olduğunda toplanma davranışı uygulanır:
+
+\begin{align}
+    \mathbf{X}_i^{t+1}
+    &=
+    \frac{\mathbf{X}_1+\mathbf{X}_2}{2},
+    \label{eq:wo_gathering}\\
+    \mathbf{X}_1
+    &=
+    \mathbf{X}_{\mathrm{best}}^t
+    -a_1b_1
+    \left|
+        \mathbf{X}_{\mathrm{best}}^t-\mathbf{X}_i^t
+    \right|,
+    \label{eq:wo_gather_x1}\\
+    \mathbf{X}_2
+    &=
+    \mathbf{X}_{\mathrm{second}}^t
+    -a_2b_2
+    \left|
+        \mathbf{X}_{\mathrm{second}}^t-\mathbf{X}_i^t
+    \right|,
+    \label{eq:wo_gather_x2}\\
+    a_k
+    &=
+    \beta_t r_5-\beta_t,
+    \qquad
+    b_k=\tan(\theta_k),
+    \qquad
+    r_5\sim\mathcal{U}(0,1),
+    \quad
+    \theta_k\in[0,\pi],
+    \quad k\in\{1,2\}.
+    \label{eq:wo_gather_coefficients}
+\end{align}
+
+Burada $\mathbf{X}_{\mathrm{second}}^t$, o anki popülasyondan seçilen
+ikinci bir bireyin konumunu temsil eder. $\mathbf{X}_1$ ve
+$\mathbf{X}_2$, en iyi ve ikinci birey çevresinde oluşturulan iki
+aday yönelimdir; yeni konum bu iki yönelimin ortalamasıyla elde edilir.
+$\tan(\theta_k)$ fonksiyonu $\theta_k=\pi/2$ noktasında tanımsız
+olduğundan, sayısal uygulamada bu noktaya çok yakın değerler
+örneklenmemelidir.
+
+\subsubsection{WO algoritmasının sözde kodu}
+
+Algoritmanın temel karar akışı Algoritma~\ref{alg:wo} içinde
+özetlenmiştir. Her yinelemede önce tehlike sinyali kontrol edilir.
+Tehlike yüksekse göç uygulanır; aksi durumda güvenlik sinyali dinlenme
+ve besin arama davranışları arasında seçim yapar.
+
+\begin{algorithm}[htbp]
+\caption{Walrus Optimizer (WO)}
+\label{alg:wo}
+\begin{algorithmic}[1]
+\Require Amaç fonksiyonu $f$, alt ve üst sınırlar $\mathbf{LB}$ ve
+         $\mathbf{UB}$, popülasyon büyüklüğü $N$, en fazla yineleme $T$
+\Ensure En iyi çözüm $\mathbf{X}_{\mathrm{best}}$ ve amaç fonksiyonu değeri
+
+\State $\mathbf{X}\gets$ Denklem~\eqref{eq:wo_initialization}'e göre popülasyonu başlat
+\State Bireyleri yetişkin, erkek, dişi ve yavru gruplarına ayır
+\State $f(\mathbf{X}_i)$ değerlerini hesapla
+\State $\mathbf{X}_{\mathrm{best}}\gets$ mevcut en iyi birey
+\For{$t=0$ \textbf{to} $T-1$}
+    \State $D_t\gets$ Denklem~\eqref{eq:wo_danger}'e göre tehlike sinyalini hesapla
+    \State $S_t\gets$ Denklem~\eqref{eq:wo_safety}'e göre güvenlik sinyalini hesapla
+    \If{$|D_t|\geq 1$}
+        \State Her bireyin konumunu göç denklemleri
+               \eqref{eq:wo_migration}--\eqref{eq:wo_beta} ile güncelle
+    \Else
+        \If{$S_t\geq 0.5$}
+            \State Erkek bireyleri Halton dizisi ile yeniden dağıt
+            \State Dişi bireyleri Denklem~\eqref{eq:wo_female} ile güncelle
+            \State Yavru bireyleri Denklem~\eqref{eq:wo_juvenile} ile güncelle
+        \Else
+            \If{$|D_t|\geq 0.5$}
+                \State Her bireyin konumunu kaçış davranışına
+                       göre, Denklem~\eqref{eq:wo_fleeing} ile güncelle
+            \Else
+                \State Her bireyin konumunu toplanma davranışına
+                       göre, Denklem~\eqref{eq:wo_gathering} ile güncelle
+            \EndIf
+        \EndIf
+    \EndIf
+    \State Sınırları aşan konumları problem kısıtlarına göre düzelt
+    \State Yeni bireylerin amaç fonksiyonu değerlerini hesapla
+    \State $\mathbf{X}_{\mathrm{best}}$ değerini güncelle
+\EndFor
+\State \Return $\mathbf{X}_{\mathrm{best}}$
+\end{algorithmic}
+\end{algorithm}
+
+\paragraph{Uygulama notu.}
+Makalenin açıklama metninde kaçış davranışı Denklem~\eqref{eq:wo_fleeing},
+toplanma davranışı ise Denklem~\eqref{eq:wo_gathering} ile tanımlanır.
+Makaledeki sözde kodda bu iki davranışın adları ve denklem
+numaraları birbiriyle ters eşleştirilmiş görünmektedir. Yukarıdaki
+algoritma, bölümdeki matematiksel açıklamayı izleyerek
+$|D_t|\geq 0.5$ durumunda kaçışı, diğer durumda toplanmayı uygular.
+
+Sınır düzeltme adımı, güncellenen çözümlerin
+$\mathbf{LB}\leq\mathbf{X}_i\leq\mathbf{UB}$ koşulunu sağlaması için
+eklenmiştir. Denklem~\eqref{eq:wo_problem}'deki sınırlara göre
+uygunluk kontrolü, uygulamada her konum güncellemesinden sonra
+yapılmalıdır.
