@@ -1,0 +1,3 @@
+[submodule "metaheuristic-algorithms"]
+	path = metaheuristic-algorithms
+	url = https://github.com/lmcasan/metaheuristic-algorithms.git
