@@ -11,6 +11,11 @@
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{makecell}
+\bibliographystyle{plain}
+
 \floatname{algorithm}{Algoritma}
 
 \begin{document}
@@ -27,6 +32,9 @@
     \noindent\textbf{Anahtar kelimeler:}
     Walrus Optimizer, sürü zekâsı, meta-sezgisel optimizasyon, PSO, ACO.
 
+    \noindent\textbf{Kod deposu:}
+    \href{https://github.com/lmcasan/metaheuristic-algorithms}{GitHub}
+
     \newpage
     \setcounter{section}{2}
     \section{Walrus Optimizer (WO)}
@@ -34,9 +42,9 @@
         \input{src/biological_fundamentals.tex}
         % Mathematical model and algorithm
         \input{src/mathematical_model.tex}
-        % Code
-        % Computational complexity
         % Comparison
-        % Qualitative analysis
-        % Quantitative analysis
+        \input{src/standard_benchmark_analysis.tex}
+
+    \newpage
+    \bibliography{src/references}
 \end{document}

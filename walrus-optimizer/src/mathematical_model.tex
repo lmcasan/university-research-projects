@@ -1,15 +1,14 @@
 \subsection{Matematiksel Model ve Algoritma}
 
-Walrus Optimizer (WO), sürekli optimizasyon problemlerinde her bir
+WO, sürekli optimizasyon problemlerinde her bir
 morsayı bir aday çözüm olarak ele alır. Bir morsanın konumu,
 problemin karar değişkenlerinden oluşan bir vektördür. WO'nun amacı,
 bu vektörleri yinelemeli olarak güncelleyerek amaç fonksiyonunu en
 küçükleyen veya en büyükleyen çözümü bulmaktır.
 
-Bu bölümde, en küçükleme problemi ele alınmaktadır:
-
 \begin{equation}
     \min_{\mathbf{x}} f(\mathbf{x}),
+    \max_{\mathbf{x}} f(\mathbf{x}):
     \qquad
     \mathbf{LB} \leq \mathbf{x} \leq \mathbf{UB},
     \label{eq:wo_problem}
@@ -53,7 +52,7 @@ göstersin. Tehlike sinyali aşağıdaki gibi tanımlanır:
     \alpha_t &= 1-\frac{t}{T}, \label{eq:wo_alpha}\\
     A_t &= 2\alpha_t, \label{eq:wo_A}\\
     R_t &= 2r_1-1, \qquad r_1\sim\mathcal{U}(0,1), \label{eq:wo_R}\\
-    D_t &= A_tR_t. \label{eq:wo_danger}
+    D_t &= A_tR_t \label{eq:wo_danger}
 \end{align}
 
 Güvenlik sinyali ise başka bir düzgün dağılımlı rastgele sayı ile
@@ -80,9 +79,9 @@ rastgele seçilen iki farklı bireyi göstermek üzere:
 \begin{align}
     \mathbf{X}_i^{t+1}
     &=
-    \mathbf{X}_i^t+\mathbf{M}_t,
+    \mathbf{X}_i^t+\mathbf{Migration\_step}_t,
     \label{eq:wo_migration}\\
-    \mathbf{M}_t
+    \mathbf{Migration\_step}_t
     &=
     \left(\mathbf{X}_m^t-\mathbf{X}_n^t\right)
     \beta_t r_3^2,
@@ -99,7 +98,7 @@ rastgele seçilen iki farklı bireyi göstermek üzere:
     \label{eq:wo_beta}
 \end{align}
 
-Burada $\mathbf{M}_t$ göç adımını, $\beta_t$ ise bu adımın büyüklüğünü
+Burada $\mathbf{Migration\_step}_t$ göç adımını, $\beta_t$ ise bu adımın büyüklüğünü
 kontrol eden katsayıyı ifade eder. $\beta_t$ yinelemeler boyunca
 azalarak aramanın başlangıcında daha geniş, ilerleyen aşamalarda ise
 daha sınırlı hareketler yapılmasına katkıda bulunur.
@@ -139,14 +138,14 @@ hem de sürünün o ana kadarki en iyi çözümünden etkilenir:
 \begin{aligned}
     \mathbf{F}_i^{t+1}
     ={}& \mathbf{F}_i^t
-    +\alpha_t\left(\mathbf{M}_i^t-\mathbf{F}_i^t\right)\\
+    +\alpha_t\left(\mathbf{Migration\_step}_i^t-\mathbf{F}_i^t\right)\\
     &+(1-\alpha_t)
     \left(\mathbf{X}_{\mathrm{best}}^t-\mathbf{F}_i^t\right).
 \end{aligned}
 \label{eq:wo_female}
 \end{equation}
 
-Burada $\mathbf{F}_i^t$ dişi bireyin, $\mathbf{M}_i^t$ ise onunla
+Burada $\mathbf{F}_i^t$ dişi bireyin, $\mathbf{Migration\_step}_i^t$ ise onunla
 eşleştirilen erkek bireyin konumudur. $\alpha_t$ azaldıkça erkek
 bireyin etkisi azalır; en iyi çözümün etkisi artar.
 
@@ -314,17 +313,3 @@ ve besin arama davranışları arasında seçim yapar.
 \State \Return $\mathbf{X}_{\mathrm{best}}$
 \end{algorithmic}
 \end{algorithm}
-
-\paragraph{Uygulama notu.}
-Makalenin açıklama metninde kaçış davranışı Denklem~\eqref{eq:wo_fleeing},
-toplanma davranışı ise Denklem~\eqref{eq:wo_gathering} ile tanımlanır.
-Makaledeki sözde kodda bu iki davranışın adları ve denklem
-numaraları birbiriyle ters eşleştirilmiş görünmektedir. Yukarıdaki
-algoritma, bölümdeki matematiksel açıklamayı izleyerek
-$|D_t|\geq 0.5$ durumunda kaçışı, diğer durumda toplanmayı uygular.
-
-Sınır düzeltme adımı, güncellenen çözümlerin
-$\mathbf{LB}\leq\mathbf{X}_i\leq\mathbf{UB}$ koşulunu sağlaması için
-eklenmiştir. Denklem~\eqref{eq:wo_problem}'deki sınırlara göre
-uygunluk kontrolü, uygulamada her konum güncellemesinden sonra
-yapılmalıdır.
